@@ -2,6 +2,29 @@
 
 A responsive weather application built with **Python and Flask** that provides real-time weather information using the **OpenWeather API**. The application features a clean, user-friendly interface and is designed to work smoothly across desktop and mobile devices.
 
+## 📸 Screenshots
+
+### 🏠 Home & Weather Details
+
+![Weather App Home](screenshots/home.png)
+
+![Weather Details](screenshots/details.png)
+
+### 📅 Forecasts
+
+![Hourly Forecast](screenshots/Hourly.png)
+
+![Weekly Forecast](screenshots/weekly-forecast.png)
+
+![Different Location Forecast](screenshots/different-Location-forecast.png)
+
+### 📍 Locations & Settings
+
+![Locations](screenshots/Locations.png)
+
+![Settings](screenshots/Settings.png)
+--
+
 ## ✨ Features
 
 * 🌍 Search weather by city
