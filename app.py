@@ -24,7 +24,7 @@ def get_weather(city, unit='metric'):
         'appid': API_KEY,
         'units': unit
     }
-    response = requests.get(url, params=params)
+    response = requests.get(url, params=params, timeout=5)
     if response.status_code == 200:
         data = response.json()
         if 'main' in data:
@@ -39,7 +39,7 @@ def get_hourly_forecast(city, unit='metric'):
         'appid': API_KEY,
         'units': unit
     }
-    response = requests.get(url, params=params)
+    response = requests.get(url, params=params, timeout=5)
     if response.status_code == 200:
         data = response.json()
         # 'list' contains forecasts every 3 hours; grab the next 8 (24 hours)
@@ -55,7 +55,7 @@ def get_daily_forecast(city, unit='metric'):
         'appid': API_KEY,
         'units': unit
     }
-    response = requests.get(url, params=params)
+    response = requests.get(url, params=params, timeout=5)
     if response.status_code != 200:
         return None
 
@@ -96,7 +96,7 @@ def get_onecall(lat, lon, unit='metric'):
         'appid': API_KEY,
         'units': unit
     }
-    response = requests.get(url, params=params)
+    response = requests.get(url, params=params, timeout=5)
     if response.status_code == 200:
         return response.json()
     return None
@@ -219,7 +219,7 @@ def get_weather_by_coords(lat, lon, unit='metric'):
         'appid': API_KEY,
         'units': unit
     }
-    response = requests.get(url, params=params)
+    response = requests.get(url, params=params, timeout=5)
     if response.status_code == 200:
         data = response.json()
         if 'main' in data:
