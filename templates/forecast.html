@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}7-Day Forecast - Weather App{% endblock %}
+
+{% block content %}
+<div class="w-full relative" style="font-family: 'Manrope', sans-serif; position: relative; z-index: 2;">
+<div class="w-full" style="font-family: 'Manrope', sans-serif;">
+
+<header class="flex justify-between items-center px-2 pt-4 w-full mb-6">
+    <a href="{{ url_for('home', city=city) }}" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10">
+        <span class="material-symbols-outlined text-white">arrow_back</span>
+    </a>
+    <h1 class="text-lg font-bold text-white">7-Day Forecast</h1>
+    <div class="w-10 h-10"></div>
+</header>
+
+<main class="space-y-3 pb-6">
+    {% for day in daily %}
+    <a href="{{ url_for('forecast_day', date=day['date_raw'], city=city) }}" class="glass-card p-5 rounded-2xl flex items-center justify-between">
+        <div class="flex flex-col gap-1">
+            <span class="text-[10px] uppercase tracking-wider text-white/50">{{ day['date'].split(',')[0] }}</span>
+            <span class="text-lg font-medium text-white">{{ day['description'] | title }}</span>
+            <div class="flex items-center gap-2 mt-1">
+                <span class="material-symbols-outlined text-indigo-300 text-base">water_drop</span>
+                <span class="text-xs text-white/60">{{ day['precipitation'] }}% Precipitation</span>
+            </div>
+        </div>
+        <div class="flex flex-col items-end gap-2">
+            <span class="material-symbols-outlined text-indigo-300" style="font-size: 44px; font-variation-settings: 'FILL' 1;">
+                {% set desc = day['description'] %}
+                {% if 'clear' in desc %}sunny
+                {% elif 'thunder' in desc or 'storm' in desc %}thunderstorm
+                {% elif 'rain' in desc or 'drizzle' in desc %}rainy
+                {% elif 'snow' in desc %}weather_snowy
+                {% elif 'cloud' in desc %}cloud
+                {% elif 'mist' in desc or 'fog' in desc or 'haze' in desc %}foggy
+                {% else %}cloud
+                {% endif %}
+            </span>
+            <div class="flex items-baseline gap-2">
+                <span class="text-2xl font-semibold text-white">{{ day['max_temp'] }}°</span>
+                <span class="text-sm text-white/50">{{ day['min_temp'] }}°</span>
+            </div>
+        </div>
+    </a>
+    {% endfor %}
+</main>
+
+</div>
+</div>
+{% endblock %}

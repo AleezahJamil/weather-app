@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Locations - Weather App{% endblock %}
+
+{% block content %}
+<div class="w-full flex flex-col flex-1" style="font-family: 'Manrope', sans-serif; position: relative; z-index: 2;">
+
+<header class="flex justify-between items-center w-full py-4 mb-4">
+    <a href="{{ url_for('home') }}" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10">
+        <span class="material-symbols-outlined text-indigo-300">arrow_back</span>
+    </a>
+    <h1 class="text-lg font-bold text-white">Locations</h1>
+    <div class="w-10 h-10"></div>
+</header>
+
+<main class="flex-1 overflow-y-auto no-scrollbar space-y-6 pb-6">
+
+    <form method="POST" action="{{ url_for('locations') }}" class="relative flex items-center">
+        <span class="material-symbols-outlined absolute left-4 text-white/50">search</span>
+        <input name="city" type="text" placeholder="Search for a city..." required
+            class="w-full h-14 pl-12 pr-16 bg-white/5 border border-white/10 rounded-full text-white placeholder-white/40 focus:ring-1 focus:ring-indigo-300 focus:outline-none">
+        <button type="submit" class="absolute right-2 w-10 h-10 flex items-center justify-center bg-indigo-300/20 rounded-full">
+            <span class="material-symbols-outlined text-indigo-300 text-lg">add</span>
+        </button>
+    </form>
+
+    <section class="space-y-3">
+        <div class="flex justify-between items-center px-1">
+            <h2 class="text-[10px] uppercase tracking-widest text-white/50">Saved Locations</h2>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+            {% for card in cards %}
+            <a href="{{ url_for('home', city=card.city) }}" class="glass-card rounded-2xl p-4 flex flex-col justify-between aspect-square">
+                <div class="flex justify-between items-start">
+                    <h3 class="text-base font-medium text-white leading-tight">{{ card.city.split(',')[0] }}</h3>
+                    <span class="material-symbols-outlined text-indigo-300 text-2xl">
+                        {% if card.icon_class == 'rain' %}rainy
+                        {% elif card.icon_class == 'storm' %}thunderstorm
+                        {% elif card.icon_class == 'snow' %}weather_snowy
+                        {% elif card.icon_class == 'sun' %}wb_sunny
+                        {% elif card.icon_class == 'moon' %}nights_stay
+                        {% elif card.icon_class == 'fog' %}foggy
+                        {% else %}cloud
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="mt-auto">
+                    <p class="text-4xl font-extralight text-white leading-none">{{ card.temp }}°</p>
+                    <p class="text-xs text-white/50 mt-2">{{ card.description }}</p>
+                </div>
+            </a>
+            {% endfor %}
+
+            <a href="{{ url_for('locations') }}" class="border-2 border-dashed border-white/10 rounded-2xl p-4 flex flex-col items-center justify-center aspect-square hover:bg-white/5">
+                <span class="material-symbols-outlined text-white/40 text-3xl">add</span>
+                <p class="text-[10px] uppercase text-white/40 mt-2">Add City</p>
+            </a>
+        </div>
+    </section>
+
+</main>
+
+</div>
+{% endblock %}

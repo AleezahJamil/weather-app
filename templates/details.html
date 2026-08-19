@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}{{ weather['weather'][0]['description'] | title if weather else 'Details' }} - Weather App{% endblock %}
+
+{% block content %}
+<header class="flex items-center px-6 py-4">
+    <a href="{{ url_for('home', city=city) }}" class="text-xl">←</a>
+</header>
+
+{% if weather %}
+<div class="flex flex-col items-center px-6 mt-2">
+    <span class="text-7xl">
+        {% set main_condition = weather['weather'][0]['main'] %}
+        {% if main_condition == 'Clear' %}☀️
+        {% elif main_condition == 'Clouds' %}☁️
+        {% elif main_condition == 'Rain' %}🌧️
+        {% elif main_condition == 'Thunderstorm' %}⛈️
+        {% elif main_condition == 'Snow' %}❄️
+        {% else %}🌤️
+        {% endif %}
+    </span>
+    <div class="text-center mt-2">
+        <span class="text-sm uppercase tracking-widest opacity-60">{{ weather['weather'][0]['description'] }}</span>
+        <h1 class="text-6xl font-light mt-1">{{ weather['main']['temp'] | round }}°{{ unit_label }}</h1>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4 w-full mt-10 pb-6">
+        {% for card in detail_cards %}
+        <div class="glass-card p-4 aspect-square flex flex-col justify-between">
+            <div class="flex items-center gap-2 opacity-60">
+                <span class="text-sm">
+                    {% if card.icon == 'uv' %}☀️
+                    {% elif card.icon == 'rain' %}💧
+                    {% elif card.icon == 'visibility' %}👁️
+                    {% elif card.icon == 'pressure' %}⏱️
+                    {% elif card.icon == 'humidity' %}💦
+                    {% elif card.icon == 'wind' %}🌬️
+                    {% elif card.icon == 'sunrise' %}🌅
+                    {% elif card.icon == 'sunset' %}🌇
+                    {% else %}•
+                    {% endif %}
+                </span>
+                <span class="text-[10px] font-bold uppercase tracking-wider">{{ card.label }}</span>
+            </div>
+            <div class="text-center py-2">
+                <span class="text-lg font-semibold">{{ card.value }}</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% else %}
+<p class="text-center opacity-70 mt-20">City not found.</p>
+{% endif %}
+{% endblock %}

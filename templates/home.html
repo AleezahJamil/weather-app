@@ -1,0 +1,263 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Weather App{% endblock %}
+
+{% block content %}
+<canvas id="weather-fx" class="absolute inset-0 pointer-events-none" style="z-index: 1;"></canvas>
+
+<div class="w-full relative" style="font-family: 'Manrope', sans-serif; z-index: 2;">
+<div class="w-full" style="font-family: 'Manrope', sans-serif;">
+
+<header class="flex justify-between items-center px-2 pt-4 w-full mb-6">
+    <a href="{{ url_for('locations') }}" class="w-10 h-10 flex items-center justify-center glass-card rounded-full">
+        <span class="material-symbols-outlined text-white text-xl">grid_view</span>
+    </a>
+    <div class="text-center">
+        <h1 class="text-lg font-medium text-white">{{ weather.city }}</h1>
+        <p class="text-[10px] tracking-widest uppercase text-white/60">{{ weather.condition }}</p>
+    </div>
+    <a href="{{ url_for('settings') }}" class="w-10 h-10 flex items-center justify-center glass-card rounded-full">
+        <span class="material-symbols-outlined text-white text-xl">more_vert</span>
+    </a>
+</header>
+
+{% if weather and weather.current_temp != '--' %}
+<section class="flex flex-col items-center text-center mb-8">
+    <div class="relative mb-2" style="animation: float 6s ease-in-out infinite;">
+        <span class="material-symbols-outlined text-white" style="font-size: 110px; font-variation-settings: 'FILL' 1, 'wght' 200;">
+            {% if weather.condition_icon == 'sun' %}wb_sunny
+            {% elif weather.condition_icon == 'rain' %}rainy
+            {% elif weather.condition_icon == 'storm' %}thunderstorm
+            {% elif weather.condition_icon == 'snow' %}weather_snowy
+            {% elif weather.condition_icon == 'moon' %}nights_stay
+            {% elif weather.condition_icon == 'fog' %}foggy
+            {% else %}cloud
+            {% endif %}
+        </span>
+    </div>
+    <span class="text-7xl font-extralight text-white">{{ weather.current_temp }}°</span>
+    <div class="flex gap-4 mt-1">
+        <span class="text-sm font-semibold text-white/60">H:{{ weather.temp_max }}°</span>
+        <span class="text-sm font-semibold text-white/60">L:{{ weather.temp_min }}°</span>
+    </div>
+</section>
+
+<section class="glass-card rounded-3xl p-5 flex justify-around items-center mb-8">
+    <div class="flex flex-col items-center gap-1">
+        <span class="material-symbols-outlined text-indigo-300 text-xl">rainy</span>
+        <span class="text-sm font-semibold text-white">{{ weather.metrics.precipitation }}</span>
+        <span class="text-[9px] uppercase text-white/50">Precipitation</span>
+    </div>
+    <div class="w-px h-10 bg-white/10"></div>
+    <div class="flex flex-col items-center gap-1">
+        <span class="material-symbols-outlined text-indigo-300 text-xl">humidity_mid</span>
+        <span class="text-sm font-semibold text-white">{{ weather.metrics.humidity }}</span>
+        <span class="text-[9px] uppercase text-white/50">Humidity</span>
+    </div>
+    <div class="w-px h-10 bg-white/10"></div>
+    <div class="flex flex-col items-center gap-1">
+        <span class="material-symbols-outlined text-indigo-300 text-xl">air</span>
+        <span class="text-sm font-semibold text-white">{{ weather.metrics.wind }}</span>
+        <span class="text-[9px] uppercase text-white/50">Wind</span>
+    </div>
+</section>
+
+{% if other_cities %}
+<section class="mb-8">
+    <div class="flex justify-between items-center mb-3 px-1">
+        <h3 class="text-base font-medium text-white">Other Cities</h3>
+        <a href="{{ url_for('locations') }}" class="material-symbols-outlined text-indigo-300 text-xl">add</a>
+    </div>
+    <div class="flex overflow-x-auto gap-3 no-scrollbar">
+        {% for c in other_cities %}
+        <a href="{{ url_for('home', city=c.city) }}" class="glass-card min-w-[150px] p-3 rounded-2xl flex flex-col gap-2">
+            <div class="flex justify-between items-start">
+                <span class="material-symbols-outlined text-indigo-300 text-lg">
+                    {% if c.icon_class == 'sun' %}wb_sunny
+                    {% elif c.icon_class == 'rain' %}rainy
+                    {% elif c.icon_class == 'storm' %}thunderstorm
+                    {% elif c.icon_class == 'snow' %}weather_snowy
+                    {% elif c.icon_class == 'moon' %}nights_stay
+                    {% elif c.icon_class == 'fog' %}foggy
+                    {% else %}cloud
+                    {% endif %}
+                </span>
+                <span class="text-sm font-semibold text-white">{{ c.temp }}°</span>
+            </div>
+            <div>
+                <p class="text-xs text-white">{{ c.city }}</p>
+                <p class="text-[9px] uppercase text-white/50">{{ c.description }}</p>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<section class="mb-4">
+    <div class="flex justify-between items-center mb-3 px-1">
+        <h3 class="text-base font-medium text-white">Today</h3>
+        <a href="{{ url_for('forecast', city=city) }}" class="text-[10px] uppercase text-indigo-300 font-bold">7-Day Forecast</a>
+    </div>
+    <div class="flex overflow-x-auto gap-2 no-scrollbar pb-2">
+        {% for hour in weather.hourly %}
+        <div class="glass-card min-w-[62px] py-3 rounded-full flex flex-col items-center gap-2 {% if loop.first %}bg-white/10{% endif %}">
+            <span class="text-[9px] text-white/70">{{ 'Now' if loop.first else hour.time }}</span>
+            <span class="material-symbols-outlined text-indigo-300 text-lg">
+                {% if hour.icon == 'sun' %}wb_sunny
+                {% elif hour.icon == 'rain' %}rainy
+                {% elif hour.icon == 'storm' %}thunderstorm
+                {% elif hour.icon == 'snow' %}weather_snowy
+                {% elif hour.icon == 'moon' %}nights_stay
+                {% elif hour.icon == 'fog' %}foggy
+                {% else %}cloud
+                {% endif %}
+            </span>
+            <span class="text-xs font-semibold text-white">{{ hour.temp }}°</span>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+{% else %}
+<div class="flex flex-col items-center mt-20">
+    <p class="text-lg text-white/70">City not found. Try again.</p>
+</div>
+{% endif %}
+
+</div>
+</div>
+
+<style>
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-15px); }
+    100% { transform: translateY(0px); }
+}
+</style>
+<script>
+(function () {
+    const canvas = document.getElementById('weather-fx');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const parent = canvas.closest('.iphone-screen') || canvas.parentElement;
+    const condition = "{{ weather.condition_icon }}";
+
+    function resize() {
+        canvas.width = parent.offsetWidth;
+        canvas.height = parent.offsetHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    let t = 0;
+
+    function drawSun() {
+        t += 0.01;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const cx = canvas.width / 2, cy = canvas.height * 0.35;
+        const pulse = 1 + Math.sin(t) * 0.05;
+        const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 220 * pulse);
+        grad.addColorStop(0, 'rgba(255, 220, 130, 0.5)');
+        grad.addColorStop(0.5, 'rgba(255, 190, 90, 0.15)');
+        grad.addColorStop(1, 'rgba(255, 190, 90, 0)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    let raindrops = [];
+    function initRain() {
+        raindrops = Array.from({ length: 80 }, () => ({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            len: Math.random() * 18 + 10,
+            speed: Math.random() * 6 + 8
+        }));
+    }
+    function drawRain() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = 'rgba(180, 200, 255, 0.35)';
+        ctx.lineWidth = 1.5;
+        raindrops.forEach(d => {
+            ctx.beginPath();
+            ctx.moveTo(d.x, d.y);
+            ctx.lineTo(d.x - 2, d.y + d.len);
+            ctx.stroke();
+            d.y += d.speed;
+            d.x -= 0.5;
+            if (d.y > canvas.height) {
+                d.y = -d.len;
+                d.x = Math.random() * canvas.width;
+            }
+        });
+    }
+
+    let clouds = [];
+    function initClouds() {
+        clouds = Array.from({ length: 5 }, () => ({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height * 0.5,
+            r: Math.random() * 60 + 40,
+            speed: Math.random() * 0.15 + 0.05
+        }));
+    }
+    function drawClouds() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        clouds.forEach(c => {
+            const grad = ctx.createRadialGradient(c.x, c.y, 0, c.x, c.y, c.r);
+            grad.addColorStop(0, 'rgba(255,255,255,0.12)');
+            grad.addColorStop(1, 'rgba(255,255,255,0)');
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
+            ctx.fill();
+            c.x += c.speed;
+            if (c.x - c.r > canvas.width) c.x = -c.r;
+        });
+    }
+
+    let stars = [];
+    function initStars() {
+        stars = Array.from({ length: 60 }, () => ({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height * 0.7,
+            r: Math.random() * 1.5 + 0.5,
+            twinkle: Math.random() * Math.PI * 2
+        }));
+    }
+    function drawStars() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        stars.forEach(s => {
+            s.twinkle += 0.03;
+            const op = 0.4 + Math.sin(s.twinkle) * 0.4;
+            ctx.beginPath();
+            ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(220, 220, 255, ${op})`;
+            ctx.fill();
+        });
+    }
+
+    let frame;
+    function animate() {
+        if (condition === 'sun') {
+            drawSun();
+        } else if (condition === 'rain' || condition === 'storm') {
+            drawRain();
+        } else if (condition === 'cloud' || condition === 'fog') {
+            drawClouds();
+        } else if (condition === 'moon') {
+            drawStars();
+        } else {
+            drawClouds();
+        }
+        frame = requestAnimationFrame(animate);
+    }
+
+    if (condition === 'rain' || condition === 'storm') initRain();
+    if (condition === 'cloud' || condition === 'fog' || !['sun','rain','storm','moon'].includes(condition)) initClouds();
+    if (condition === 'moon') initStars();
+
+    animate();
+})();
+</script>
+{% endblock %}

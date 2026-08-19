@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - Weather App{% endblock %}
+
+{% block content %}
+<div class="max-w-lg mx-auto mt-10">
+
+    <div class="glass-card rounded-3xl p-8 shadow-xl">
+
+        <h1 class="text-3xl font-bold text-center mb-8">
+            Settings
+        </h1>
+
+        <form method="POST">
+
+            <!-- Temperature Unit -->
+            <div class="mb-8">
+                <label class="block text-lg font-semibold mb-3">
+                    Temperature Unit
+                </label>
+
+                <div class="flex gap-3">
+                    <label class="flex-1">
+                        <input type="radio"
+                               name="unit"
+                               value="metric"
+                               {% if unit == 'metric' %}checked{% endif %}
+                               class="hidden peer">
+
+                        <div class="text-center py-3 rounded-xl border border-gray-600 cursor-pointer peer-checked:bg-violet-500 peer-checked:text-white transition">
+                            °C
+                        </div>
+                    </label>
+
+                    <label class="flex-1">
+                        <input type="radio"
+                               name="unit"
+                               value="imperial"
+                               {% if unit == 'imperial' %}checked{% endif %}
+                               class="hidden peer">
+
+                        <div class="text-center py-3 rounded-xl border border-gray-600 cursor-pointer peer-checked:bg-violet-500 peer-checked:text-white transition">
+                            °F
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Wind Speed -->
+            <div class="mb-8">
+                <label class="block text-lg font-semibold mb-3">
+                    Wind Speed Unit
+                </label>
+
+                <select name="wind_unit"
+                        class="w-full rounded-xl bg-gray-800 border border-gray-600 p-3 text-white">
+                    <option value="kmh">km/h</option>
+                    <option value="mph">mph</option>
+                </select>
+            </div>
+
+            <!-- Weather Alerts -->
+            <div class="flex justify-between items-center mb-8">
+                <span class="text-lg font-semibold">
+                    Weather Alerts
+                </span>
+
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox"
+                           name="alerts"
+                           class="sr-only peer"
+                           {% if alerts %}checked{% endif %}>
+
+                    <div class="w-11 h-6 bg-gray-600 rounded-full peer peer-checked:bg-violet-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:h-5 after:w-5 after:rounded-full after:transition-all peer-checked:after:translate-x-5"></div>
+                </label>
+            </div>
+
+            <!-- Auto Refresh -->
+            <div class="flex justify-between items-center mb-8">
+                <span class="text-lg font-semibold">
+                    Auto Refresh
+                </span>
+
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox"
+                           name="auto_refresh"
+                           class="sr-only peer"
+                           {% if auto_refresh %}checked{% endif %}>
+
+                    <div class="w-11 h-6 bg-gray-600 rounded-full peer peer-checked:bg-violet-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:h-5 after:w-5 after:rounded-full after:transition-all peer-checked:after:translate-x-5"></div>
+                </label>
+            </div>
+
+            <!-- Save Button -->
+            <button
+                type="submit"
+                class="w-full bg-violet-600 hover:bg-violet-700 text-white py-3 rounded-xl font-semibold transition">
+
+                Save Settings
+
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+{% endblock %}

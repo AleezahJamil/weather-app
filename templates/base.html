@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>{% block title %}Weather App{% endblock %}</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+        }
+      }
+    }
+</script>
+<style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+    }
+    body {
+      background-color: #3e3d6e;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .iphone-screen {
+      width: 375px;
+      height: 812px;
+      max-width: 100%;
+      max-height: 100%;
+      border-radius: 40px;
+      background: linear-gradient(180deg, #2e335a 0%, #1c1b33 100%);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+      color: white;
+      border: 8px solid #1a1a1a;
+      display: flex;
+      flex-direction: column;
+    }
+    @media (max-width: 480px) {
+      html, body {
+        overflow: hidden;
+      }
+      .iphone-screen {
+        width: 100vw;
+        height: 100dvh;
+        border-radius: 0;
+        border: none;
+        box-shadow: none;
+      }
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+    }
+    .status-bar {
+      height: 44px;
+      padding: 0 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+    .scroll-content {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      padding: 0 4px 16px;
+    }
+    .scroll-content.home-scroll {
+      padding-bottom: 110px;
+    }
+    .nav-wrapper {
+      position: absolute;
+      left: 24px;
+      right: 24px;
+      bottom: 24px;
+      padding: 0;
+      z-index: 40;
+      transform: translateZ(0);
+      -webkit-transform: translateZ(0);
+      will-change: transform;
+      pointer-events: auto;
+    }
+    .home-nav-wrapper {
+      position: absolute;
+      left: 24px;
+      right: 24px;
+      bottom: 24px;
+      padding: 0;
+      z-index: 40;
+      pointer-events: auto;
+    }
+    .nav-wrapper nav {
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      box-shadow: 0 18px 35px rgba(0, 0, 0, 0.18);
+      backdrop-filter: blur(35px);
+      -webkit-backdrop-filter: blur(35px);
+    }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+</style>
+</head>
+<body>
+<section class="iphone-screen">
+    <canvas class="particle-canvas absolute inset-0 pointer-events-none" style="z-index: 0;"></canvas>
+
+    <div class="status-bar" style="position: relative; z-index: 2;">
+        <span>1:41</span>
+        <span>📶 📡 🔋</span>
+    </div>
+
+    <div class="scroll-content no-scrollbar {% if request.endpoint == 'home' %}home-scroll{% endif %}" style="position: relative; z-index: 2;">
+        {% block content %}{% endblock %}
+    </div>
+
+    <div class="nav-wrapper {% if request.endpoint == 'home' %}home-nav-wrapper{% endif %}">
+        <nav class="flex justify-around items-center h-16 bg-white/5 backdrop-blur-xl border border-white/10 rounded-full shadow-2xl">
+            <a href="{{ url_for('home') }}" class="p-2 {% if request.endpoint == 'home' %}text-indigo-300{% else %}text-white/50{% endif %}">
+                <span class="material-symbols-outlined" style="{% if request.endpoint == 'home' %}font-variation-settings: 'FILL' 1;{% endif %}">today</span>
+            </a>
+            <a href="{{ url_for('forecast', city=city if city else 'Lahore') }}" class="p-2 {% if request.endpoint in ['forecast','forecast_day'] %}text-indigo-300{% else %}text-white/50{% endif %}">
+                <span class="material-symbols-outlined" style="{% if request.endpoint in ['forecast','forecast_day'] %}font-variation-settings: 'FILL' 1;{% endif %}">calendar_month</span>
+            </a>
+            <a href="{{ url_for('details', city=city if city else 'Lahore') }}" class="p-2 {% if request.endpoint == 'details' %}text-indigo-300{% else %}text-white/50{% endif %}">
+                <span class="material-symbols-outlined" style="{% if request.endpoint == 'details' %}font-variation-settings: 'FILL' 1;{% endif %}">radar</span>
+            </a>
+            <a href="{{ url_for('locations') }}" class="p-2 {% if request.endpoint == 'locations' %}text-indigo-300{% else %}text-white/50{% endif %}">
+                <span class="material-symbols-outlined" style="{% if request.endpoint == 'locations' %}font-variation-settings: 'FILL' 1;{% endif %}">location_on</span>
+            </a>
+            <a href="{{ url_for('settings') }}" class="p-2 {% if request.endpoint == 'settings' %}text-indigo-300{% else %}text-white/50{% endif %}">
+                <span class="material-symbols-outlined" style="{% if request.endpoint == 'settings' %}font-variation-settings: 'FILL' 1;{% endif %}">settings</span>
+            </a>
+        </nav>
+    </div>
+</section>
+
+<script>
+(function () {
+    const canvas = document.querySelector('.particle-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const parent = canvas.parentElement;
+
+    function resize() {
+        canvas.width = parent.offsetWidth;
+        canvas.height = parent.offsetHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    class Particle {
+        constructor() { this.reset(); }
+        reset() {
+            this.x = Math.random() * canvas.width;
+            this.y = canvas.height + Math.random() * 20;
+            this.size = Math.random() * 2 + 0.5;
+            this.speedY = Math.random() * 0.4 + 0.2;
+            this.speedX = (Math.random() - 0.5) * 0.2;
+            this.opacity = Math.random() * 0.7;
+            this.fadingIn = Math.random() > 0.5;
+            this.fadeSpeed = Math.random() * 0.01 + 0.002;
+            this.life = 0;
+            this.maxLife = Math.random() * 500 + 500;
+        }
+        update() {
+            this.y -= this.speedY;
+            this.x += this.speedX;
+            this.life++;
+            if (this.fadingIn) {
+                this.opacity += this.fadeSpeed;
+                if (this.opacity >= 0.5) this.fadingIn = false;
+            } else if (this.life > this.maxLife * 0.7) {
+                this.opacity -= this.fadeSpeed;
+            }
+            if (this.y < -10 || this.life > this.maxLife) this.reset();
+        }
+        draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(230, 230, 255, ${this.opacity})`;
+            ctx.shadowBlur = 8;
+            ctx.shadowColor = 'rgba(255,255,255,0.4)';
+            ctx.fill();
+        }
+    }
+
+    const particles = Array.from({ length: 120 }, () => new Particle());
+    particles.forEach(p => {
+        p.y = Math.random() * canvas.height;
+        p.opacity = Math.random() * 0.7;
+        p.fadingIn = Math.random() > 0.5;
+    });
+
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => { p.update(); p.draw(); });
+        requestAnimationFrame(animate);
+    }
+    animate();
+})();
+
+window.addEventListener('load', () => {
+    const sc = document.querySelector('.scroll-content');
+    if (sc) {
+        sc.scrollTop = 1;
+        requestAnimationFrame(() => {
+            sc.scrollTop = 0;
+        });
+    }
+});
+</script>
+</body>
+</html>
